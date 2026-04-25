@@ -729,7 +729,7 @@ async function connectWithToken() {
 }
 
 function startOAuth() {
-  const oauthUrl = `https://accounts.salla.sa/oauth2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=offline_access+read+write+products&state=salla_oauth`;
+  const oauthUrl = `https://accounts.salla.sa/oauth2/auth?client_id=${CLIENT_ID}&reconst oauthUrl = `https://accounts.salla.sa/oauth2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent('https://queenshawarma.github.io/salla-uploader')}&response_type=code&scope=offline_access+read+write+products&state=salla_oauth`;
   window.open(oauthUrl, '_blank', 'width=600,height=700');
   document.getElementById('oauthWaiting').classList.remove('hidden');
   log('info', 'تم فتح صفحة تسجيل الدخول...');
