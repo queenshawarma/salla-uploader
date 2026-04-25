@@ -1197,13 +1197,13 @@ function showAlert(msg, type) {
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // Check for OAuth callback
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   const code = new URLSearchParams(window.location.search).get('code');
   if (code) {
     document.getElementById('authMethod').value = 'oauth';
     toggleAuthMethod();
-    document.getElementById('oauthWaiting').classList.remove('hidden');
-    log('info', 'تم اكتشاف كود OAuth، اضغطي "تم تسجيل الدخول"');
+    log('info', 'تم اكتشاف كود OAuth، جاري تسجيل الدخول تلقائياً...');
+    await checkOAuthCallback();
   }
 });
 </script>
