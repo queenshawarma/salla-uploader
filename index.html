@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salla SEO Uploader</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --primary: #1a1a2e;
+    --accent: #00d4aa;
+    --accent2: #7c3aed;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --muted: #64748b;
+    --danger: #ef4444;
+    --success: #10b981;
+    --warning: #f59e0b;
+  }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--primary);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text { font-size: 18px; font-weight: 700; }
+  .logo-sub { font-size: 12px; color: rgba(255,255,255,0.5); }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+
+  .status-dot.connected { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    gap: 0;
+    margin-bottom: 2rem;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .step {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-left: 1px solid var(--border);
+    position: relative;
+  }
+
+  .step:last-child { border-left: none; }
+
+  .step.active { background: rgba(0,212,170,0.08); }
+  .step.done { background: rgba(0,212,170,0.04); }
+
+  .step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .step.active .step-num {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,170,0.1);
+  }
+
+  .step.done .step-num {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: white;
+  }
+
+  .step-info { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .step-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Panels */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  /* Form */
+  .form-group { margin-bottom: 1.25rem; }
+  label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  label span { color: var(--muted); font-weight: 400; }
+
+  input[type="text"], input[type="url"], textarea, select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    transition: border-color 0.2s;
+    direction: rtl;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: white;
+  }
+
+  textarea { resize: vertical; min-height: 100px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 24px;
+    border-radius: 10px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--primary);
+  }
+
+  .btn-primary:hover { background: #00bfa0; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1.5px solid var(--border);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-danger {
+    background: rgba(239,68,68,0.1);
+    color: var(--danger);
+    border: 1.5px solid rgba(239,68,68,0.2);
+  }
+
+  .btn-sm { padding: 7px 14px; font-size: 13px; }
+
+  /* Connect box */
+  .connect-box {
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: border-color 0.3s;
+  }
+
+  .connect-box:hover { border-color: var(--accent); }
+
+  .connect-icon {
+    font-size: 48px;
+    margin-bottom: 1rem;
+  }
+
+  .connect-box h3 { font-size: 20px; font-weight: 700; margin-bottom: 0.5rem; }
+  .connect-box p { color: var(--muted); font-size: 14px; margin-bottom: 1.5rem; }
+
+  /* Alert */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .alert-info { background: rgba(0,212,170,0.08); border: 1px solid rgba(0,212,170,0.2); color: #065f46; }
+  .alert-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: #92400e; }
+  .alert-danger { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #991b1b; }
+  .alert-success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: #065f46; }
+
+  /* Product table */
+  .products-grid { display: flex; flex-direction: column; gap: 12px; }
+
+  .product-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    transition: border-color 0.2s;
+  }
+
+  .product-row:hover { border-color: var(--accent); }
+
+  .product-row.selected { border-color: var(--accent); background: rgba(0,212,170,0.04); }
+  .product-row.uploading { border-color: var(--warning); background: rgba(245,158,11,0.04); }
+  .product-row.done { border-color: var(--success); background: rgba(16,185,129,0.04); }
+  .product-row.error { border-color: var(--danger); background: rgba(239,68,68,0.04); }
+
+  .product-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .product-meta { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
+  .product-meta span { display: flex; align-items: center; gap: 4px; }
+
+  .product-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .badge-pending { background: rgba(100,116,139,0.1); color: var(--muted); }
+  .badge-uploading { background: rgba(245,158,11,0.1); color: var(--warning); }
+  .badge-done { background: rgba(16,185,129,0.1); color: var(--success); }
+  .badge-error { background: rgba(239,68,68,0.1); color: var(--danger); }
+
+  /* Progress */
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .toolbar .left { flex: 1; }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .stat-num { font-size: 28px; font-weight: 700; color: var(--accent); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* Preview modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .modal {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 700px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    direction: rtl;
+  }
+
+  .modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .field-group { margin-bottom: 1.25rem; }
+  .field-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .field-val { font-size: 14px; color: var(--text); background: var(--bg); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); line-height: 1.6; }
+
+  /* Log */
+  .log-box {
+    background: #0f172a;
+    border-radius: 10px;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 13px;
+    color: #94a3b8;
+    max-height: 200px;
+    overflow-y: auto;
+    direction: ltr;
+    text-align: left;
+  }
+
+  .log-line { padding: 2px 0; }
+  .log-line.success { color: #34d399; }
+  .log-line.error { color: #f87171; }
+  .log-line.info { color: #60a5fa; }
+  .log-line.warn { color: #fbbf24; }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0,0,0,0.1);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+
+  .hidden { display: none !important; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    main { padding: 1rem; }
+    .steps { flex-direction: column; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-text">Salla SEO Uploader</div>
+      <div class="logo-sub">رفع وتحسين محتوى المنتجات</div>
+    </div>
+  </div>
+  <div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">غير متصل</span>
+  </div>
+</header>
+
+<main>
+  <!-- Steps nav -->
+  <div class="steps">
+    <div class="step active" id="step1Nav" onclick="goStep(1)">
+      <div class="step-num">1</div>
+      <div class="step-info">
+        <div class="step-title">ربط سلة</div>
+        <div class="step-desc">تسجيل الدخول للمتجر</div>
+      </div>
+    </div>
+    <div class="step" id="step2Nav" onclick="goStep(2)">
+      <div class="step-num">2</div>
+      <div class="step-info">
+        <div class="step-title">Google Sheet</div>
+        <div class="step-desc">رابط ملف البيانات</div>
+      </div>
+    </div>
+    <div class="step" id="step3Nav" onclick="goStep(3)">
+      <div class="step-num">3</div>
+      <div class="step-info">
+        <div class="step-title">المنتجات</div>
+        <div class="step-desc">مراجعة ورفع</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 1: Connect Salla -->
+  <div class="panel active" id="panel1">
+    <div class="card">
+      <div class="card-title">ربط متجر سلة</div>
+      <div class="card-desc">ادخلي بيانات المتجر اللي عايزة تشتغلي عليه. البيانات مش بتتحفظ، بتتمسح فور ما تقفلي الصفحة.</div>
+
+      <div class="alert alert-info">
+        💡 كل مرة تشتغلي على عميل جديد، بس غيري الـ Access Token
+      </div>
+
+      <div class="form-group">
+        <label>طريقة الربط</label>
+        <select id="authMethod" onchange="toggleAuthMethod()">
+          <option value="token">Access Token مباشر</option>
+          <option value="oauth">تسجيل دخول بإيميل وباسورد (OAuth)</option>
+        </select>
+      </div>
+
+      <!-- Token method -->
+      <div id="tokenSection">
+        <div class="form-group">
+          <label>Access Token <span>(من لوحة تحكم سلة)</span></label>
+          <input type="text" id="accessToken" placeholder="ألصقي الـ Token هنا..." />
+        </div>
+        <button class="btn btn-primary" onclick="connectWithToken()">
+          <span>🔗</span> ربط المتجر
+        </button>
+      </div>
+
+      <!-- OAuth method -->
+      <div id="oauthSection" class="hidden">
+        <div class="connect-box">
+          <div class="connect-icon">🏪</div>
+          <h3>تسجيل الدخول بحساب سلة</h3>
+          <p>اضغطي الزر واللي هيفتح صفحة سلة تسجل دخول بالإيميل والباسورد بتاع المتجر</p>
+          <button class="btn btn-primary" onclick="startOAuth()">
+            <span>🔑</span> تسجيل الدخول عبر سلة
+          </button>
+        </div>
+
+        <div id="oauthWaiting" class="hidden">
+          <div class="alert alert-warning">
+            ⏳ في انتظار إتمام تسجيل الدخول... بعد ما تسجلي دخول على سلة ارجعي هنا
+          </div>
+          <button class="btn btn-secondary" onclick="checkOAuthCallback()">
+            ✅ تم تسجيل الدخول، اضغطي هنا
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connected state -->
+    <div id="connectedCard" class="card hidden">
+      <div class="alert alert-success">
+        ✅ تم الربط بنجاح! المتجر جاهز
+      </div>
+      <div id="storeInfo" style="font-size:14px; color: var(--muted);"></div>
+      <div style="margin-top:1rem; display:flex; gap:12px;">
+        <button class="btn btn-primary" onclick="goStep(2)">التالي: ربط الشيت ←</button>
+        <button class="btn btn-secondary btn-sm" onclick="disconnect()">قطع الاتصال</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Google Sheet -->
+  <div class="panel" id="panel2">
+    <div class="card">
+      <div class="card-title">ربط Google Sheet</div>
+      <div class="card-desc">ادخلي رابط الشيت بتاع العميل. تأكدي إن الشيت مفتوح للقراءة (Share → Anyone with the link)</div>
+
+      <div class="alert alert-info">
+        📋 الشيت لازم يكون فيه الأعمدة: اسم المنتج (B)، الكلمة المفتاحية (C)، لينك الدوك (E)، Meta Title (L)، Meta Description (M)
+      </div>
+
+      <div class="form-group">
+        <label>رابط Google Sheet</label>
+        <input type="url" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..." dir="ltr" />
+      </div>
+
+      <div class="form-group">
+        <label>رقم الصف الأول للبيانات <span>(عادةً 2 لأن الأول header)</span></label>
+        <input type="text" id="startRow" value="2" style="width:100px;" />
+      </div>
+
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="loadSheet()">
+          <span>📊</span> تحميل البيانات
+        </button>
+        <button class="btn btn-secondary" onclick="goStep(1)">← رجوع</button>
+      </div>
+    </div>
+
+    <div id="sheetPreview" class="card hidden">
+      <div class="card-title">معاينة البيانات</div>
+      <div id="sheetPreviewContent"></div>
+      <div style="margin-top:1rem;">
+        <button class="btn btn-primary" onclick="goStep(3)">التالي: مراجعة المنتجات ←</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Products -->
+  <div class="panel" id="panel3">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">إجمالي المنتجات</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statDone" style="color:var(--success)">0</div>
+        <div class="stat-label">تم الرفع</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statPending" style="color:var(--muted)">0</div>
+        <div class="stat-label">في الانتظار</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statError" style="color:var(--danger)">0</div>
+        <div class="stat-label">أخطاء</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="left">
+        <button class="btn btn-primary" onclick="uploadAll()" id="uploadAllBtn">
+          <span>🚀</span> رفع كل المنتجات
+        </button>
+        <button class="btn btn-secondary" onclick="uploadSelected()" id="uploadSelectedBtn" style="margin-right:8px;">
+          رفع المحدد
+        </button>
+      </div>
+      <div>
+        <button class="btn btn-secondary btn-sm" onclick="selectAll()">تحديد الكل</button>
+        <button class="btn btn-secondary btn-sm" style="margin-right:8px;" onclick="deselectAll()">إلغاء التحديد</button>
+        <button class="btn btn-secondary btn-sm" style="margin-right:8px;" onclick="goStep(2)">← رجوع</button>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div id="progressSection" class="hidden" style="margin-bottom:1rem;">
+      <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-bottom:6px;">
+        <span id="progressText">جاري الرفع...</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Products list -->
+    <div class="products-grid" id="productsList"></div>
+
+    <!-- Log -->
+    <div class="card" style="margin-top:1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div class="card-title" style="margin:0;">سجل العمليات</div>
+        <button class="btn btn-secondary btn-sm" onclick="clearLog()">مسح</button>
+      </div>
+      <div class="log-box" id="logBox">
+        <div class="log-line info">// جاهز للعمل...</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Preview Modal -->
+<div class="modal-overlay hidden" id="previewModal">
+  <div class="modal">
+    <div class="modal-title">
+      <span>معاينة المنتج</span>
+      <button class="modal-close" onclick="closePreview()">✕</button>
+    </div>
+    <div id="previewContent"></div>
+    <div style="margin-top:1.5rem; display:flex; gap:12px;">
+      <button class="btn btn-primary" id="previewUploadBtn">⬆️ رفع هذا المنتج</button>
+      <button class="btn btn-secondary" onclick="closePreview()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLIENT_ID = '1e696335-289e-41ce-ad32-61342ef2ea82';
+const CLIENT_SECRET = '743bc6561f009dd0a0eb41a87e07a2f89552e68bf12db0ca0c6fe2dd5a421a8f';
+const REDIRECT_URI = window.location.href.split('?')[0];
+
+let state = {
+  token: null,
+  storeId: null,
+  storeName: null,
+  products: [],
+  selectedProducts: new Set(),
+  currentPreviewIdx: null,
+  uploading: false
+};
+
+// =================== AUTH ===================
+
+function toggleAuthMethod() {
+  const method = document.getElementById('authMethod').value;
+  document.getElementById('tokenSection').classList.toggle('hidden', method !== 'token');
+  document.getElementById('oauthSection').classList.toggle('hidden', method !== 'oauth');
+}
+
+async function connectWithToken() {
+  const token = document.getElementById('accessToken').value.trim();
+  if (!token) { showAlert('ادخلي الـ Token أولاً', 'warning'); return; }
+
+  log('info', 'جاري التحقق من الـ Token...');
+
+  try {
+    const res = await sallaGet('/v2/store/info', token);
+    if (res && res.data) {
+      state.token = token;
+      state.storeId = res.data.id;
+      state.storeName = res.data.name;
+      setConnected();
+      log('success', `✅ تم الربط بمتجر: ${state.storeName}`);
+    } else {
+      log('error', 'Token غير صحيح أو منتهي');
+      showAlert('Token غير صحيح، تأكدي منه وحاولي تاني', 'danger');
+    }
+  } catch(e) {
+    log('error', 'خطأ في الاتصال: ' + e.message);
+    showAlert('خطأ في الاتصال بسلة: ' + e.message, 'danger');
+  }
+}
+
+function startOAuth() {
+  const oauthUrl = `https://accounts.salla.sa/oauth2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=offline_access+read+write+products&state=salla_oauth`;
+  window.open(oauthUrl, '_blank', 'width=600,height=700');
+  document.getElementById('oauthWaiting').classList.remove('hidden');
+  log('info', 'تم فتح صفحة تسجيل الدخول...');
+}
+
+async function checkOAuthCallback() {
+  const code = new URLSearchParams(window.location.search).get('code');
+  if (!code) {
+    showAlert('لم يتم العثور على كود التفويض. تأكدي من إتمام تسجيل الدخول', 'warning');
+    return;
+  }
+  log('info', 'جاري استرداد الـ Token...');
+  try {
+    const res = await fetch('https://accounts.salla.sa/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&code=${code}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&grant_type=authorization_code`
+    });
+    const data = await res.json();
+    if (data.access_token) {
+      state.token = data.access_token;
+      await connectWithToken_fromOAuth();
+    } else {
+      log('error', 'فشل استرداد Token: ' + JSON.stringify(data));
+    }
+  } catch(e) {
+    log('error', 'خطأ: ' + e.message);
+  }
+}
+
+async function connectWithToken_fromOAuth() {
+  const res = await sallaGet('/v2/store/info', state.token);
+  if (res && res.data) {
+    state.storeId = res.data.id;
+    state.storeName = res.data.name;
+    setConnected();
+    log('success', `✅ تم الربط بمتجر: ${state.storeName}`);
+  }
+}
+
+function setConnected() {
+  document.getElementById('statusDot').classList.add('connected');
+  document.getElementById('statusText').textContent = state.storeName || 'متصل';
+  document.getElementById('connectedCard').classList.remove('hidden');
+  document.getElementById('storeInfo').textContent = `المتجر: ${state.storeName} | ID: ${state.storeId}`;
+  markStepDone(1);
+}
+
+function disconnect() {
+  state.token = null;
+  state.storeId = null;
+  state.storeName = null;
+  document.getElementById('statusDot').classList.remove('connected');
+  document.getElementById('statusText').textContent = 'غير متصل';
+  document.getElementById('connectedCard').classList.add('hidden');
+  document.getElementById('accessToken').value = '';
+}
+
+// =================== SHEET ===================
+
+async function loadSheet() {
+  const url = document.getElementById('sheetUrl').value.trim();
+  if (!url) { showAlert('ادخلي رابط الشيت', 'warning'); return; }
+
+  const sheetId = extractSheetId(url);
+  if (!sheetId) { showAlert('الرابط مش صحيح، تأكدي من رابط Google Sheet', 'danger'); return; }
+
+  log('info', 'جاري تحميل بيانات الشيت...');
+
+  const startRow = parseInt(document.getElementById('startRow').value) || 2;
+  const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
+
+  try {
+    const res = await fetch(csvUrl);
+    if (!res.ok) throw new Error('تأكدي إن الشيت مفتوح للعموم (Share → Anyone with link)');
+    const text = await res.text();
+    const rows = parseCSV(text);
+
+    state.products = [];
+    for (let i = startRow - 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row[1] || row[1].trim() === '') continue;
+      state.products.push({
+        idx: i,
+        no: row[0] || '',
+        name: row[1] || '',
+        keyword: row[2] || '',
+        volume: row[3] || '',
+        docUrl: row[4] || '',
+        done: row[5] || '',
+        index: row[6] || '',
+        metaTitle: row[11] || '',
+        metaDesc: row[12] || '',
+        sallaId: null,
+        status: 'pending',
+        content: null
+      });
+    }
+
+    log('success', `تم تحميل ${state.products.length} منتج`);
+    showSheetPreview();
+    markStepDone(2);
+  } catch(e) {
+    log('error', 'خطأ في تحميل الشيت: ' + e.message);
+    showAlert(e.message, 'danger');
+  }
+}
+
+function extractSheetId(url) {
+  const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  return match ? match[1] : null;
+}
+
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.split('\n');
+  for (const line of lines) {
+    const cols = [];
+    let inQuote = false, cur = '';
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQuote = !inQuote; }
+      else if (ch === ',' && !inQuote) { cols.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
+    }
+    cols.push(cur.trim());
+    rows.push(cols);
+  }
+  return rows;
+}
+
+function showSheetPreview() {
+  const preview = document.getElementById('sheetPreview');
+  const content = document.getElementById('sheetPreviewContent');
+  const sample = state.products.slice(0, 3);
+  let html = `<p style="font-size:14px; color:var(--muted); margin-bottom:1rem;">تم العثور على <strong>${state.products.length}</strong> منتج. عينة:</p>`;
+  for (const p of sample) {
+    html += `<div style="padding:8px 12px; background:var(--bg); border-radius:8px; margin-bottom:8px; font-size:13px;">
+      <strong>${p.name}</strong> — كلمة: ${p.keyword} — Title: ${p.metaTitle.substring(0,40)}...
+    </div>`;
+  }
+  content.innerHTML = html;
+  preview.classList.remove('hidden');
+}
+
+// =================== PRODUCTS ===================
+
+function renderProducts() {
+  const list = document.getElementById('productsList');
+  list.innerHTML = '';
+  updateStats();
+
+  for (let i = 0; i < state.products.length; i++) {
+    const p = state.products[i];
+    const isSelected = state.selectedProducts.has(i);
+    const statusBadge = {
+      pending: '<span class="badge badge-pending">⏳ انتظار</span>',
+      uploading: '<span class="badge badge-uploading"><span class="spinner"></span> جاري الرفع</span>',
+      done: '<span class="badge badge-done">✅ تم</span>',
+      error: '<span class="badge badge-error">❌ خطأ</span>'
+    }[p.status] || '';
+
+    const row = document.createElement('div');
+    row.className = `product-row ${p.status} ${isSelected ? 'selected' : ''}`;
+    row.innerHTML = `
+      <div style="display:flex; gap:12px; align-items:flex-start;">
+        <input type="checkbox" style="margin-top:4px; cursor:pointer;" ${isSelected?'checked':''} onchange="toggleSelect(${i}, this.checked)" />
+        <div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-meta">
+            <span>🔑 ${p.keyword || 'لا يوجد'}</span>
+            <span>📝 ${p.metaTitle ? p.metaTitle.substring(0,30)+'...' : 'لا يوجد Title'}</span>
+            ${p.docUrl ? '<span>📄 دوك موجود</span>' : '<span style="color:var(--danger)">⚠️ لا يوجد دوك</span>'}
+          </div>
+        </div>
+      </div>
+      <div class="product-status">
+        ${statusBadge}
+        <button class="btn btn-secondary btn-sm" onclick="previewProduct(${i})">معاينة</button>
+        <button class="btn btn-primary btn-sm" onclick="uploadOne(${i})" ${p.status==='done'?'disabled':''}>رفع</button>
+      </div>
+    `;
+    list.appendChild(row);
+  }
+}
+
+function toggleSelect(idx, checked) {
+  if (checked) state.selectedProducts.add(idx);
+  else state.selectedProducts.delete(idx);
+}
+
+function selectAll() {
+  state.products.forEach((_, i) => state.selectedProducts.add(i));
+  renderProducts();
+}
+
+function deselectAll() {
+  state.selectedProducts.clear();
+  renderProducts();
+}
+
+function updateStats() {
+  const total = state.products.length;
+  const done = state.products.filter(p => p.status === 'done').length;
+  const pending = state.products.filter(p => p.status === 'pending').length;
+  const error = state.products.filter(p => p.status === 'error').length;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statError').textContent = error;
+}
+
+// =================== PREVIEW ===================
+
+async function previewProduct(idx) {
+  const p = state.products[idx];
+  state.currentPreviewIdx = idx;
+
+  let content = p.content;
+  if (!content && p.docUrl) {
+    log('info', 'جاري تحميل محتوى الدوك...');
+    content = await fetchGoogleDoc(p.docUrl);
+    state.products[idx].content = content;
+  }
+
+  document.getElementById('previewContent').innerHTML = `
+    <div class="field-group">
+      <div class="field-label">اسم المنتج</div>
+      <div class="field-val">${p.name}</div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">الكلمة المفتاحية</div>
+      <div class="field-val">${p.keyword}</div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Meta Title</div>
+      <div class="field-val">${p.metaTitle || '<span style="color:var(--muted)">لا يوجد</span>'}</div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Meta Description</div>
+      <div class="field-val">${p.metaDesc || '<span style="color:var(--muted)">لا يوجد</span>'}</div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">المحتوى (من الدوك)</div>
+      <div class="field-val" style="max-height:200px; overflow-y:auto; white-space:pre-wrap; font-size:13px;">${content || '<span style="color:var(--muted)">لا يوجد دوك أو تعذر التحميل</span>'}</div>
+    </div>
+  `;
+
+  document.getElementById('previewUploadBtn').onclick = () => { closePreview(); uploadOne(idx); };
+  document.getElementById('previewModal').classList.remove('hidden');
+}
+
+function closePreview() {
+  document.getElementById('previewModal').classList.add('hidden');
+}
+
+// =================== UPLOAD ===================
+
+async function uploadAll() {
+  if (!state.token) { showAlert('ربطي سلة أولاً', 'warning'); return; }
+  if (state.products.length === 0) { showAlert('حملي الشيت أولاً', 'warning'); return; }
+
+  const pending = state.products.filter((p, i) => p.status !== 'done');
+  await uploadBatch(pending.map((_, idx) => state.products.indexOf(_)));
+}
+
+async function uploadSelected() {
+  if (state.selectedProducts.size === 0) { showAlert('اختاري منتجات أولاً', 'warning'); return; }
+  await uploadBatch([...state.selectedProducts]);
+}
+
+async function uploadOne(idx) {
+  await uploadBatch([idx]);
+}
+
+async function uploadBatch(indices) {
+  if (state.uploading) return;
+  state.uploading = true;
+
+  const progress = document.getElementById('progressSection');
+  const fill = document.getElementById('progressFill');
+  const pText = document.getElementById('progressText');
+  const pPct = document.getElementById('progressPct');
+  progress.classList.remove('hidden');
+
+  let done = 0;
+  const total = indices.length;
+
+  for (const idx of indices) {
+    const p = state.products[idx];
+    if (p.status === 'done') { done++; continue; }
+
+    p.status = 'uploading';
+    renderProducts();
+    log('info', `جاري رفع: ${p.name}`);
+
+    try {
+      // Find product in salla
+      const sallaProduct = await findSallaProduct(p.name);
+      if (!sallaProduct) {
+        throw new Error(`لم يتم العثور على المنتج في سلة: ${p.name}`);
+      }
+
+      // Get content from doc
+      if (!p.content && p.docUrl) {
+        p.content = await fetchGoogleDoc(p.docUrl);
+      }
+
+      // Update product
+      await updateSallaProduct(sallaProduct.id, p);
+      p.status = 'done';
+      p.sallaId = sallaProduct.id;
+      log('success', `✅ تم رفع: ${p.name} (ID: ${sallaProduct.id})`);
+    } catch(e) {
+      p.status = 'error';
+      log('error', `❌ فشل: ${p.name} — ${e.message}`);
+    }
+
+    done++;
+    const pct = Math.round((done / total) * 100);
+    fill.style.width = pct + '%';
+    pText.textContent = `${done} / ${total}`;
+    pPct.textContent = pct + '%';
+    renderProducts();
+
+    await sleep(500);
+  }
+
+  state.uploading = false;
+  log('success', `🎉 انتهت العملية: ${done}/${total}`);
+
+  if (done === total) {
+    showAlert(`تم رفع ${done} منتج بنجاح!`, 'success');
+  }
+}
+
+async function findSallaProduct(name) {
+  try {
+    const res = await sallaGet(`/v2/products?search=${encodeURIComponent(name)}&per_page=5`, state.token);
+    if (res && res.data && res.data.length > 0) {
+      return res.data[0];
+    }
+    return null;
+  } catch(e) {
+    log('warn', 'خطأ في البحث: ' + e.message);
+    return null;
+  }
+}
+
+async function updateSallaProduct(productId, p) {
+  const payload = {
+    name: p.name,
+    metadata: {
+      title: p.metaTitle || '',
+      description: p.metaDesc || ''
+    },
+    slug: p.keyword ? p.keyword.replace(/\s+/g, '-') : undefined
+  };
+
+  if (p.content) {
+    payload.description = p.content;
+  }
+
+  const res = await sallaPut(`/v2/products/${productId}`, payload, state.token);
+  if (!res || res.error) {
+    throw new Error(res?.error?.message || 'فشل تحديث المنتج');
+  }
+  return res;
+}
+
+// =================== GOOGLE DOC ===================
+
+async function fetchGoogleDoc(url) {
+  try {
+    const docId = extractDocId(url);
+    if (!docId) return null;
+    const exportUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
+    const res = await fetch(exportUrl);
+    if (!res.ok) return null;
+    const text = await res.text();
+    return text.trim();
+  } catch(e) {
+    return null;
+  }
+}
+
+function extractDocId(url) {
+  const match = url.match(/\/document\/d\/([a-zA-Z0-9-_]+)/);
+  return match ? match[1] : null;
+}
+
+// =================== SALLA API ===================
+
+async function sallaGet(path, token) {
+  const res = await fetch(`https://api.salla.dev${path}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  });
+  return res.json();
+}
+
+async function sallaPut(path, body, token) {
+  const res = await fetch(`https://api.salla.dev${path}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+// =================== NAVIGATION ===================
+
+function goStep(n) {
+  if (n >= 2 && !state.token) { showAlert('ربطي سلة أولاً', 'warning'); return; }
+  if (n >= 3 && state.products.length === 0) { showAlert('حملي الشيت أولاً', 'warning'); return; }
+
+  [1,2,3].forEach(i => {
+    document.getElementById(`panel${i}`).classList.toggle('active', i === n);
+    document.getElementById(`step${i}Nav`).classList.toggle('active', i === n);
+  });
+
+  if (n === 3) renderProducts();
+}
+
+function markStepDone(n) {
+  document.getElementById(`step${n}Nav`).classList.add('done');
+}
+
+// =================== UTILS ===================
+
+function log(type, msg) {
+  const box = document.getElementById('logBox');
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+  const time = new Date().toLocaleTimeString('ar-EG');
+  line.textContent = `[${time}] ${msg}`;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('logBox').innerHTML = '<div class="log-line info">// تم مسح السجل</div>';
+}
+
+function showAlert(msg, type) {
+  const types = { success:'✅', warning:'⚠️', danger:'❌', info:'ℹ️' };
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = `toast alert alert-${type}`;
+  toast.style.cssText = 'position:fixed; top:80px; left:50%; transform:translateX(-50%); z-index:9999; min-width:300px; max-width:500px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);';
+  toast.innerHTML = `${types[type] || 'ℹ️'} ${msg}`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Check for OAuth callback
+window.addEventListener('load', () => {
+  const code = new URLSearchParams(window.location.search).get('code');
+  if (code) {
+    document.getElementById('authMethod').value = 'oauth';
+    toggleAuthMethod();
+    document.getElementById('oauthWaiting').classList.remove('hidden');
+    log('info', 'تم اكتشاف كود OAuth، اضغطي "تم تسجيل الدخول"');
+  }
+});
+</script>
+</body>
+</html>
